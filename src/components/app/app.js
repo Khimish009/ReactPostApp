@@ -16,12 +16,15 @@ export default class App extends Component {
         {label: 'Going to learn NODEJS', important: false, like: false, id: 2},
         {label: 'Going to learn Vue', important: false, like: false, id: 3},
         {label: 'Going to learn Flutters', important: false, like: false, id: 4},
-      ]
+      ],
+      term: ''
     }
     this.deletePost = this.deletePost.bind(this)
     this.onAdd = this.onAdd.bind(this)
     this.onToogleImportant = this.onToogleImportant.bind(this)
     this.onToogleLiked = this.onToogleLiked.bind(this)
+    this.onUpdateSearch = this.onUpdateSearch.bind(this)
+    this.searchPost = this.searchPost.bind(this)
 
     this.maxId = 5
   }
@@ -72,23 +75,36 @@ export default class App extends Component {
         data: newArr
       }
     })
-    console.log(this.state.data)
+  }
+
+  searchPost(items, term) {
+    if(term.length === 0) {
+      return items
+    }
+
+    return items.filter(item => item.label.toLowerCase().indexOf(term.toLowerCase()) > -1)
+  }
+
+  onUpdateSearch(term) {
+    this.setState({term})
   }
 
   render() {
-    const {data} = this.state
+    const {data, term} = this.state
     const liked = data.filter(item => item.like).length
     const allPost = data.length
+
+    const visiblePost = this.searchPost(data, term)
 
     return (
       <div className="app">
         <AppHeader like={liked} allPost={allPost} />
         <div className="search-panel d-flex">
-          <SearchPanel />
+          <SearchPanel onUpdateSearch={this.onUpdateSearch}/>
           <PostStatusFilter />
         </div>
         <PostList 
-          posts={data}
+          posts={visiblePost}
           onDelete={this.deletePost}
           onToogleImportant={this.onToogleImportant}
           onToogleLiked={this.onToogleLiked}
